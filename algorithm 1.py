@@ -18,16 +18,15 @@ num_of_states = 2  # Ένα tuple (y(t),y_set)
 num_of_actions = 1
 c = tf.get_variable('reward_constant', shape=[1], initializer=tf.constant_initializer[5])
 
-Q_table = np.zeros(num_of_states, num_of_actions)   # Q_table initialization
-action = tf.placeholder(np.argmax(Q_table))   # Greedy Policy initialization
 W_a = tf.get_variable('W_a', shape=[1], initializer=tf.constant_initializer[random.uniform(-1, 1)])  # Weight init.
 W_c = tf.get_variable('W_c', shape=[1], initializer=tf.constant_initializer[random.uniform(-1, 1)])  # Weight init.
 y_1 = 5.3    # Η συνάρτηση από την G(s) όταν t=1
-y_set = tf.constant(tf.random.uniform(0, 1))    # Ένα τυχαίο set point
+y_set = tf.constant(tf.random.uniform(0, 0.3))    # Ένα τυχαίο set point
 initial_state_tuple = (y_1, y_set)
 initial_state = tf.placeholder(initial_state_tuple)
 
 y = []
+
 
 # Replay Memory
 class ReplayMemory(object):
@@ -62,16 +61,6 @@ class ReplayMemory(object):
         return s_batch, a_batch, r_batch, s_next_batch
 
 
-for t in range(T):
-    s = (y(t), y_set)
-    action = action
-
-    # Reward Function
-    def reward(t, y_set, y):
-        if True:
-            for j in range(t):
-                abs(y - y_set) < epsilon
-                return c
 
 
 

@@ -1,5 +1,7 @@
 import tensorflow as tf
+
 tf.enable_eager_execution()
+
 
 x = tf.get_variable('w', shape=[1, 1], initializer=tf.constant_initializer([1.]))
 y = tf.get_variable('y', shape=[1, 1], initializer=tf.constant_initializer([1.]))

@@ -19,8 +19,9 @@ class ReplayMemory(object):
             del self.memory[0]
             self.memory.append(experience)
 
+    batch = []
+
     def sample_use(self, batch_size):      # Επιλέγει ένα τυχαίο batch από την μνήμη μεγέθους batch_size
-        batch = []
 
         if self.position < batch_size:
             batch = random.sample(self.memory, self.position)

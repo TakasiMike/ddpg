@@ -7,33 +7,18 @@ tau = 0.001
 
 class ActorNet:
 
-    def __init__(self, num_of_states, num_of_actions, W1_a, W2_a, W3_a, B1_a, B2_a, B3_a, t_W1_a, t_W2_a,
-                 t_W3_a, t_B1_a, t_B2_a, t_B3_a, actor_state_in, t_actor_state_in):
+    def __init__(self, num_of_states, num_of_actions):
         self.g = tf.Graph()
         with self.g.as_default():
             self.sess = tf.InteractiveSession()
 
         # Παράμετροι του actor
-
-        self.W1_a = W1_a
-        self.B1_a = B1_a
-        self.W2_a = W2_a
-        self.B2_a = B2_a
-        self.W3_a = W3_a
-        self.B3_a = B3_a
-        self.actor_state_in = actor_state_in
-        self.actor_model = self.create_actor_net(num_of_states, num_of_actions)
+        self.W1_a, self.B1_a, self.W2_a, self.B2_a, self.W3_a, self.B3_a, \
+            self.actor_state_in, self.actor_model = self.create_actor_net(num_of_states, num_of_actions)
 
         # Παράμετροι του target network
-
-        self.t_W1_a = t_W1_a
-        self.t_B1_a = t_B1_a
-        self.t_W2_a = t_W2_a
-        self.t_B2_a = t_B2_a
-        self.t_W3_a = t_W3_a
-        self.t_B3_a = t_B3_a
-        self.t_actor_state_in = t_actor_state_in
-        self.t_actor_model = self.create_actor_net(num_of_states, num_of_actions)
+        self.t_W1_a, self.t_B1_a, self.t_W2_a, self.t_B2_a, self.t_W3_a, self.t_B3_a, \
+            self.t_actor_state_in, self.t_actor_model = self.create_actor_net(num_of_states, num_of_actions)
 
         # Σχηματισμός του κόστους του actor
         # Αρχικά παίρνουμε ως input το dQ/dα από το critic network
@@ -88,12 +73,14 @@ class ActorNet:
     def evaluate_target_actor(self, state_t_1):
         return self.sess.run(self.t_actor_model, feed_dict={self.t_actor_state_in: state_t_1})
 
-    # def compute_dp_dw(self, policy_t, weights_t):
-    #     return self.sess.run(self.pol_grad,
-    #                          feed_dict={self.actor_state_in: policy_t, self.actor_parameters: weights_t})
+    def train_actor(self, state_t_batch, q_gradient_input):
+        self.sess.run(self.optimizer,
+                      feed_dict={self.actor_state_in: state_t_batch, self.q_value_input: q_gradient_input})
 
     def update_target_actor(self):
         self.sess.run(self.update_target_actor_op)
+
+
 
 
 

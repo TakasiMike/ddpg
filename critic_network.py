@@ -6,35 +6,22 @@ tau = 0.001
 
 class CriticNet:
 
-    def __init__(self, num_of_states, num_of_actions, W1_c, W2_c, W3_c, B1_c, B2_c, B3_c, t_W1_c, t_W2_c, t_W3_c,
-                  t_B1_c, t_B2_c, t_B3_c, critic_state_in, t_critic_state_in, critic_action_in, t_critic_action_in):
+    def __init__(self, num_of_states, num_of_actions):
         self.g = tf.Graph()
         with self.g.as_default():
             self.sess = tf.InteractiveSession()
 
         # Παράμετροι του critic network
 
-        self.W1_c = W1_c
-        self.B1_c = B1_c
-        self.W2_c = W2_c
-        self.B2_c = B2_c
-        self.W3_c = W3_c
-        self.B3_c = B3_c
-        self.critic_state_in = critic_state_in
-        self.critic_action_in = critic_action_in
-        self.critic_q_model = self.create_critic_net(num_of_states, num_of_actions)
+        self.W1_c, self.B1_c, self.W2_c, self.W2_action_c, self.B2_c, self.W3_c, self.B3_c, \
+            self.critic_q_model, self.critic_state_in, self.critic_action_in = self.create_critic_net(num_of_states,
+                                                                                                      num_of_actions)
 
         # Παράμετροι του target critic network
 
-        self.t_W1_c = t_W1_c
-        self.t_B1_c = t_B1_c
-        self.t_W2_c = t_W2_c
-        self.t_B2_c = t_B2_c
-        self.t_W3_c = t_W3_c
-        self.t_B3_c = t_B3_c
-        self.t_critic_state_in = t_critic_state_in
-        self.t_critic_action_in = t_critic_action_in
-        self.t_critic_q_model = self.create_critic_net(num_of_states, num_of_actions)
+        self.t_W1_c, self.t_B1_c, self.t_W2_c, self.t_W2_action_c, self.t_B2_c, self.t_W3_c, self.t_B3_c, \
+            self.t_critic_q_model, self.t_critic_state_in, \
+            self.t_critic_action_in = self.create_critic_net(num_of_states, num_of_actions)
 
         # Σχηματισμός της συνάρτησης κόστους του critic, η οποία θα ελαχιστοποιηθεί ως προς τα βάρη Wc
         self.q_value_in = tf.placeholder('float', [None, 1])
@@ -87,7 +74,7 @@ class CriticNet:
         H1_c = tf.nn.sigmoid(tf.add(tf.matmul(critic_state_in, W1_c), B1_c))
         H2_c = tf.nn.sigmoid(tf.add(tf.matmul(H1_c, W2_c), B2_c))
         critic_q_model = tf.add(tf.matmul(H2_c, W3_c), B3_c)
-        return W1_c, W2_c, W3_c, B1_c, B2_c, B3_c, critic_state_in, critic_action_in, critic_q_model, W2_action_c
+        return W1_c, B1_c, W2_c, B2_c, W3_c, B3_c, critic_state_in, critic_action_in, critic_q_model, W2_action_c
 
     # Συνάρτηση που εκπαιδεύει το critic network
 

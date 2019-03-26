@@ -12,18 +12,17 @@ Batch_Size = 32
 Gamma = 0.99  # Discount Factor
 c = 10  # Reward Constant
 y_set = 1  # Set point
-is_grad_inverter = True
 
 
 class ddpg:
 
     def __init__(self, current_state, next_state, action, reward, done, current_state_batch,
                  next_state_batch, action_batch, reward_batch, done_batch, next_action_batch, y_i_batch, num_states,
-                 num_actions):
+                 num_actions, dq_da):
         self.num_states = num_states
         self.num_actions = num_actions
-        self.critic_net = CriticNet.create_critic_net(num_states, num_actions)
-        self.actor_net = ActorNet.create_actor_net(num_states, num_actions)
+        self.critic_net = CriticNet(self.num_states, self.num_actions)
+        self.actor_net = ActorNet(self.num_states, self.num_actions)
         self.current_state = current_state
         self.next_state = next_state
         self.action = action
@@ -36,6 +35,7 @@ class ddpg:
         self.done_batch = done_batch
         self.next_action_batch = next_action_batch
         self.y_i_batch = y_i_batch
+        self.dq_da = dq_da
 
         # Initialization του Replay Memory
         self.replay_memory = deque()
@@ -58,6 +58,9 @@ class ddpg:
         self.time_step += 1
         if len(self.replay_memory) > RM_size:
             self.replay_memory.popleft()
+
+    def evaluate_actor(self, current_state):
+        return self.actor_net.evaluate_actor(current_state)
 
     # Συνάρτηση που ορίζει ένα mini batch tuple (s,a,s',r)
     def minibatches(self):
@@ -92,15 +95,37 @@ class ddpg:
         self.next_action_batch = self.actor_net.evaluate_target_actor(self.next_state_batch)
         # Σχηματισμός του Q_t ^i (s',a',W)
         q_next = self.critic_net.evaluate_target_network(self.next_state_batch, self.next_action_batch)
+        # Υπολογισμός του reward και προσθήκη του στο άδειο array παρακάτω
         self.y_i_batch = []
         for i in range(0, Batch_Size):
-            if self.done_batch[i]:
-                self.y_i_batch.append(self.reward(self, i))
+            if i == Batch_Size:
+                self.y_i_batch.append(self.reward())
             else:
-                self.y_i_batch.append(self.reward(self, i) + Gamma*q_next[i][0])
+                self.y_i_batch.append(self.reward() + Gamma*q_next[i][0])
 
-        self. y_i_batch = np.array(self.y_i_batch)
+        self.y_i_batch = np.array(self.y_i_batch)
         self.y_i_batch = np.reshape(self.y_i_batch, [len(self.y_i_batch), 1])
+
+        # Update του critic (Βήμα 16 του αλγορίθμου):
+        self.critic_net.train_critic(self.current_state_batch, self.action_batch, self.y_i_batch)
+
+        # Update του actor:
+
+        # Υπολογισμός ενός action από το δίκτυο του actor που θα χρησιμοποιηθεί για το gradient:
+        action_for_gradient = self.actor_net.evaluate_actor(self.current_state_batch)
+
+        # Υπολογισμός του gradient inverter (Βήμα 17 του αλγορίθμου):
+        self.dq_da = self.critic_net.compute_dq_da(self.current_state_batch, action_for_gradient)
+
+        # Update του actor (Βήμα 18 του αλγορίθμου):
+        self.actor_net.train_actor(self.current_state_batch, self.dq_da)
+
+        # Τελικό update του target actor & critic
+        self.critic_net.update_target_critic()
+        self.actor_net.update_target_actor()
+
+
+
 
 
 

@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 learning_rate = 0.0001
 tau = 0.001
 
@@ -14,8 +15,8 @@ class CriticNet:
         # Παράμετροι του critic network
 
         self.W1_c, self.B1_c, self.W2_c, self.W2_action_c, self.B2_c, self.W3_c, self.B3_c, \
-            self.critic_q_model, self.critic_state_in, self.critic_action_in = self.create_critic_net(num_of_states,
-                                                                                                      num_of_actions)
+            self.critic_q_model, self.critic_state_in, \
+            self.critic_action_in = self.create_critic_net(num_of_states, num_of_actions)
 
         # Παράμετροι του target critic network
 

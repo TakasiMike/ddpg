@@ -5,7 +5,7 @@ class Grad_Inverter:
 
     def __init__(self, action_bounds):
 
-        self.action_size = len(action_bounds[0])  # 1
+        self.action_size = 1
         self.sess = tf.InteractiveSession()
         self.action_input = tf.placeholder(tf.float32, [None, 1])
         self.p_max = tf.constant(action_bounds[0], dtype=tf.float32)

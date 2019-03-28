@@ -11,8 +11,6 @@ c = 10  # reward value
 # Το περιβάλλον του προβλήματος
 g = control.tf([0.05, 0], [-0.6, 1])
 sys = control.tf2ss(g)
-num_of_states = 2
-num_of_actions = 1
 
 
 def reward(state):

@@ -6,21 +6,18 @@ import random
 from grad_inverter import Grad_Inverter
 
 
-# Καθολικές Παράμετροι
+
 RM_size = 100000
 Batch_Size = 32
 Gamma = 0.99  # Discount Factor
-c = 10  # Reward Constant
-y_set = 1  # Set point
-
 
 class DDPG:
 
-    def __init__(self, num_states, num_actions):
-        self.num_states = num_states
-        self.num_actions = num_actions
-        self.critic_net = CriticNet(self.num_states, self.num_actions)
-        self.actor_net = ActorNet(self.num_states, self.num_actions)
+    def __init__(self, num_of_states, num_of_actions):
+        self.num_of_states = num_of_states
+        self.num_of_actions = num_of_actions
+        self.critic_net = CriticNet(self.num_of_states, self.num_of_actions)
+        self.actor_net = ActorNet(self.num_of_states, self.num_of_actions)
 
         # Initialization του Replay Memory
         self.replay_memory = deque()
@@ -62,7 +59,7 @@ class DDPG:
         # Action π(t)
         self.action_batch = [item[3] for item in batch]
         self.action_batch = np.array(self.action_batch)
-        self.action_batch = np.reshape(self.action_batch, [len(self.action_batch), self.num_actions])
+        self.action_batch = np.reshape(self.action_batch, [len(self.action_batch), self.num_of_actions])
 
     # Συνάρτηση που θα εκπαιδεύει το μοντέλο
     def model_train(self):

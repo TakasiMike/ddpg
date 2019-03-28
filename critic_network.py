@@ -13,7 +13,7 @@ class CriticNet:
             self.sess = tf.InteractiveSession()
 
         # Παράμετροι του critic network
-
+        self.sess.run(tf.initialize_all_variables())
         self.W1_c, self.B1_c, self.W2_c, self.W2_action_c, self.B2_c, self.W3_c, self.B3_c, \
             self.critic_q_model, self.critic_state_in, \
             self.critic_action_in = self.create_critic_net(num_of_states, num_of_actions)
@@ -25,8 +25,9 @@ class CriticNet:
             self.t_critic_action_in = self.create_critic_net(num_of_states, num_of_actions)
 
         # Σχηματισμός της συνάρτησης κόστους του critic, η οποία θα ελαχιστοποιηθεί ως προς τα βάρη Wc
-        self.q_value_in = tf.placeholder('float', [None, 1])
-        self.cost = tf.reduce_sum(tf.pow(self.q_value_in - self.critic_q_model, 2))
+        self.q_value_in = tf.placeholder("float", [None, 1])
+        self.l2_regularizer_loss = 0.0001 * tf.reduce_sum(tf.pow(self.W2_c, 2)) + 0.0001 * tf.reduce_sum(tf.pow(self.B2_c, 2))
+        self.cost = tf.reduce_sum(tf.pow(self.q_value_in - self.critic_q_model, 2)) + self.l2_regularizer_loss
         self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.cost)
 
         #  Action Gradient (dQ/da)
@@ -36,7 +37,7 @@ class CriticNet:
         # self.critic_parameters = [self.W1_c, self.W2_c, self.W3_c]
         # self.weight_grad_v = tf.gradients(self.critic_q_model, self.critic_parameters)
 
-        self.sess.run(tf.initialize_all_variables())
+
 
         self.sess.run([
             self.t_W1_c.assign(self.W1_c),
@@ -63,13 +64,13 @@ class CriticNet:
         num_hidden_2 = 30
         critic_state_in = tf.placeholder('float', [None, num_of_states])
         critic_action_in = tf.placeholder('float', [None, num_of_actions])
-        W1_c = tf.Variable(tf.random.uniform[num_of_states, num_hidden_1])
-        W2_c = tf.Variable(tf.random.uniform[num_hidden_1, num_hidden_2])
-        W2_action_c = tf.Variable(tf.random.uniform[num_of_actions, num_hidden_2])
-        W3_c = tf.Variable(tf.random.uniform[num_hidden_2, num_of_actions])
-        B1_c = tf.Variable(tf.random.uniform[num_hidden_1])
-        B2_c = tf.Variable(tf.random.uniform[num_hidden_2])
-        B3_c = tf.Variable(tf.random.uniform[num_of_actions])
+        W1_c = tf.Variable(tf.random.uniform([num_of_states, num_hidden_1]))
+        W2_c = tf.Variable(tf.random.uniform([num_hidden_1, num_hidden_2]))
+        W2_action_c = tf.Variable(tf.random.uniform([num_of_actions, num_hidden_2]))
+        W3_c = tf.Variable(tf.random.uniform([num_hidden_2, num_of_actions]))
+        B1_c = tf.Variable(tf.random.uniform([num_hidden_1]))
+        B2_c = tf.Variable(tf.random.uniform([num_hidden_2]))
+        B3_c = tf.Variable(tf.random.uniform([num_of_actions]))
 
         # Forward Feed
         H1_c = tf.nn.sigmoid(tf.add(tf.matmul(critic_state_in, W1_c), B1_c))

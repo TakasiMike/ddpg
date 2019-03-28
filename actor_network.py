@@ -54,12 +54,12 @@ class ActorNet:
         num_hidden_1 = 30
         num_hidden_2 = 30
         actor_state_in = tf.placeholder('float', [None, num_of_states])
-        W1_a = tf.Variable(tf.random.uniform[num_of_states, num_hidden_1])
-        W2_a = tf.Variable(tf.random.uniform[num_hidden_1, num_hidden_2])
-        W3_a = tf.Variable(tf.random.uniform[num_hidden_2, num_of_actions])
-        B1_a = tf.Variable(tf.random.uniform[num_hidden_1])
-        B2_a = tf.Variable(tf.random.uniform[num_hidden_2])
-        B3_a = tf.Variable(tf.random.uniform[num_of_actions])
+        W1_a = tf.Variable(tf.random.uniform([num_of_states, num_hidden_1]))
+        W2_a = tf.Variable(tf.random.uniform([num_hidden_1, num_hidden_2]))
+        W3_a = tf.Variable(tf.random.uniform([num_hidden_2, num_of_actions]))
+        B1_a = tf.Variable(tf.random.uniform([num_hidden_1]))
+        B2_a = tf.Variable(tf.random.uniform([num_hidden_2]))
+        B3_a = tf.Variable(tf.random.uniform([num_of_actions]))
 
         # Forward Feed
         H1_a = tf.nn.sigmoid(tf.add(tf.matmul(actor_state_in, W1_a), B1_a))

@@ -3,7 +3,7 @@ from actor_network import ActorNet
 from critic_network import CriticNet
 from collections import deque
 import random
-from grad_inverter import Grad_Inverter
+from grad_inverter import grad_inverter
 
 
 
@@ -27,7 +27,7 @@ class DDPG:
         action_max = 35
         action_min = 0
         action_bounds = [action_max, action_min]
-        self.grad_inverter = Grad_Inverter(action_bounds)
+        self.grad_inverter = grad_inverter(action_bounds)
 
     # Συνάρτηση που βάζει ένα experience (s,a,r,s') στο RM
     def add_experience(self, current_state, next_state, action, reward):
@@ -60,6 +60,9 @@ class DDPG:
         self.action_batch = [item[3] for item in batch]
         self.action_batch = np.array(self.action_batch)
         self.action_batch = np.reshape(self.action_batch, [len(self.action_batch), self.num_of_actions])
+
+    def get_current_state(self):
+        return self.replay_memory(self.current_state_batch)
 
     # Συνάρτηση που θα εκπαιδεύει το μοντέλο
     def model_train(self):

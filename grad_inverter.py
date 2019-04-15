@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-class Grad_Inverter:
+class grad_inverter:
 
     def __init__(self, action_bounds):
 
@@ -10,7 +10,7 @@ class Grad_Inverter:
         self.action_input = tf.placeholder(tf.float32, [None, 1])
         self.p_max = tf.constant(action_bounds[0], dtype=tf.float32)
         self.p_min = tf.constant(action_bounds[1], dtype=tf.float32)
-        self.p_range = tf.constant([x - y for x, y in zip(action_bounds[0], action_bounds[1])], dtype=tf.float32)
+        self.p_range = self.p_max - self.p_min
         self.p_diff_max = tf.div(-self.action_input + self.p_max, self.p_range)
         self.p_diff_min = tf.div(self.action_input - self.p_min, self.p_range)
         self.zeros_act_grad_filter = tf.zeros([self.action_size])

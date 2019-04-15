@@ -8,9 +8,10 @@ tau = 0.001
 class ActorNet:
 
     def __init__(self, num_of_states, num_of_actions):
-        self.g = tf.Graph()
-        with self.g.as_default():
-            self.sess = tf.InteractiveSession()
+        # self.g = tf.Graph()
+        # with self.g.as_default():
+        #     self.sess = tf.InteractiveSession()
+        self.sess = tf.Session()
 
         # Παράμετροι του actor
         self.W1_a, self.B1_a, self.W2_a, self.B2_a, self.W3_a, self.B3_a, \
@@ -53,7 +54,7 @@ class ActorNet:
     def create_actor_net(self, num_of_states=2, num_of_actions=1):
         num_hidden_1 = 30
         num_hidden_2 = 30
-        actor_state_in = tf.placeholder('float', [None, num_of_states])
+        actor_state_in = tf.placeholder(tf.float32, shape=[None, num_of_states])
         W1_a = tf.Variable(tf.random.uniform([num_of_states, num_hidden_1]))
         W2_a = tf.Variable(tf.random.uniform([num_hidden_1, num_hidden_2]))
         W3_a = tf.Variable(tf.random.uniform([num_hidden_2, num_of_actions]))
@@ -62,13 +63,13 @@ class ActorNet:
         B3_a = tf.Variable(tf.random.uniform([num_of_actions]))
 
         # Forward Feed
-        H1_a = tf.nn.sigmoid(tf.add(tf.matmul(actor_state_in, W1_a), B1_a))
+        H1_a = tf.nn.sigmoid(tf.matmul(actor_state_in, W1_a) + B1_a)
         H2_a = tf.nn.sigmoid(tf.add(tf.matmul(H1_a, W2_a), B2_a))
         actor_model = tf.add(tf.matmul(H2_a, W3_a), B3_a)
         return W1_a, W2_a, W3_a, B1_a, B2_a, B3_a, actor_state_in, actor_model
 
-    def evaluate_actor(self, state_t):
-        return self.sess.run(self.actor_model, feed_dict={self.actor_state_in: state_t})
+    def evaluate_actor(self, current_state):
+        return self.sess.run(self.actor_model, feed_dict={self.actor_state_in: current_state})
 
     def evaluate_target_actor(self, state_t_1):
         return self.sess.run(self.t_actor_model, feed_dict={self.t_actor_state_in: state_t_1})

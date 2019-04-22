@@ -118,3 +118,5 @@ tcl
 include
 Scripts
 .idea
+bin
+pip-selfcheck.json

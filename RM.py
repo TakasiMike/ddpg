@@ -35,3 +35,8 @@ class ReplayMemory(object):
         return s_batch, a_batch, r_batch, s_next_batch
 
 
+
+
+
+
+rm = ReplayMemory(capacity=20)

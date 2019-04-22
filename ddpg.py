@@ -36,7 +36,7 @@ class DDPG:
         self.action = action
         self.reward = reward
 
-        self.replay_memory.append(self.current_state, self.next_state, self.action, self.reward)
+        self.replay_memory.append([self.current_state, self.next_state, self.action, self.reward])
         self.time_step += 1
         if len(self.replay_memory) > RM_size:
             self.replay_memory.popleft()
@@ -61,46 +61,52 @@ class DDPG:
         self.action_batch = np.array(self.action_batch)
         self.action_batch = np.reshape(self.action_batch, [len(self.action_batch), self.num_of_actions])
 
-    def get_current_state(self):
-        return self.replay_memory(self.current_state_batch)
+
+
 
     # Συνάρτηση που θα εκπαιδεύει το μοντέλο
     def model_train(self):
-        self.minibatches()
-        # Σχηματισμός της επόμενης δράσης π(s',W)
-        self.next_action_batch = self.actor_net.evaluate_target_actor(self.next_state_batch)
-        # Σχηματισμός του Q_t ^i (s',a',W)
-        q_next = self.critic_net.evaluate_target_network(self.next_state_batch, self.next_action_batch)
+        if len(self.replay_memory) < Batch_Size:
+            self.replay_memory.append([[0, 0], [0, 0], 0, 0])
+        else:
 
-        # Υπολογισμός του reward και προσθήκη του στο άδειο array παρακάτω
-        self.y_i_batch = []
-        for i in range(0, Batch_Size):
+            self.minibatches()
+            # Σχηματισμός της επόμενης δράσης π(s',W)
+            self.next_action_batch = self.actor_net.evaluate_target_actor(self.next_state_batch)
+            # Σχηματισμός του Q_t ^i (s',a',W)
 
-            if i == Batch_Size:
-                self.y_i_batch.append(self.reward())
-            else:
-                self.y_i_batch.append(self.reward() + Gamma*q_next[i][0])
+            q_next = self.critic_net.evaluate_target_network(self.next_state, self.next_action_batch)
 
-        self.y_i_batch = np.array(self.y_i_batch)
-        self.y_i_batch = np.reshape(self.y_i_batch, [len(self.y_i_batch), 1])
 
-        # Update του critic (Βήμα 16 του αλγορίθμου):
-        self.critic_net.train_critic(self.current_state_batch, self.action_batch, self.y_i_batch)
+            # Υπολογισμός του reward και προσθήκη του στο άδειο array παρακάτω
+            self.y_i_batch = []
+            for i in range(0, Batch_Size):
 
-        # Update του actor:
+                if i == Batch_Size:
+                    self.y_i_batch.append(self.reward())
+                else:
+                    self.y_i_batch.append(self.reward() + Gamma*q_next[i][0])
 
-        # Υπολογισμός ενός action από το δίκτυο του actor που θα χρησιμοποιηθεί για το gradient:
-        action_for_gradient = self.actor_net.evaluate_actor(self.current_state_batch)
+            self.y_i_batch = np.array(self.y_i_batch)
+            self.y_i_batch = np.reshape(self.y_i_batch, [len(self.y_i_batch), 1])
 
-        # Υπολογισμός του gradient inverter (Βήμα 17 του αλγορίθμου):
-        self.dq_da = self.critic_net.compute_dq_da(self.current_state_batch, action_for_gradient)
+            # Update του critic (Βήμα 16 του αλγορίθμου):
+            self.critic_net.train_critic(self.current_state_batch, self.action_batch, self.y_i_batch)
 
-        # Update του actor (Βήμα 18 του αλγορίθμου):
-        self.actor_net.train_actor(self.current_state_batch, self.dq_da)
+            # Update του actor:
 
-        # Τελικό update του target actor & critic
-        self.critic_net.update_target_critic()
-        self.actor_net.update_target_actor()
+            # Υπολογισμός ενός action από το δίκτυο του actor που θα χρησιμοποιηθεί για το gradient:
+            action_for_gradient = self.actor_net.evaluate_actor(self.current_state_batch)
+
+            # Υπολογισμός του gradient inverter (Βήμα 17 του αλγορίθμου):
+            self.dq_da = self.critic_net.compute_dq_da(self.current_state_batch, action_for_gradient)
+
+            # Update του actor (Βήμα 18 του αλγορίθμου):
+            self.actor_net.train_actor(self.current_state_batch, self.dq_da)
+
+            # Τελικό update του target actor & critic
+            self.critic_net.update_target_critic()
+            self.actor_net.update_target_actor()
 
 
 

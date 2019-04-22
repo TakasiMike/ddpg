@@ -25,6 +25,8 @@ class CriticNet:
             self.t_critic_q_model, self.t_critic_state_in, \
             self.t_critic_action_in = self.create_critic_net(num_of_states, num_of_actions)
 
+
+
         # Σχηματισμός της συνάρτησης κόστους του critic, η οποία θα ελαχιστοποιηθεί ως προς τα βάρη Wc
         self.q_value_in = tf.placeholder("float", [None, 1])
         self.l2_regularizer_loss = 0.0001 * tf.reduce_sum(tf.pow(self.W2_c, 2)) + 0.0001 * tf.reduce_sum(tf.pow(self.B2_c, 2))
@@ -95,9 +97,9 @@ class CriticNet:
 
     # Δίνουμε ως input το s' και α' και παίρνουμε το target critic network
 
-    def evaluate_target_network(self, state_t_1, action_t_1):
+    def evaluate_target_network(self, next_state, next_action):
         return self.sess.run(self.t_critic_q_model,
-                             feed_dict={self.t_critic_state_in: state_t_1, self.t_critic_action_in: action_t_1})
+                             feed_dict={self.t_critic_state_in: next_state, self.t_critic_action_in: next_action})
 
     # Συνάρτηση που υπολογίζει το dQ/dα. Σαν inputs έχει το s και α
 

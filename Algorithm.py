@@ -29,7 +29,7 @@ def output(system, T, U, init_cond):
 def main():
     with tf.Graph().as_default():
         agent = DDPG(number_of_states, number_of_actions)
-        reward_per_episode = 0
+        reward_per_time_step = 0
 
 
         # For Loop του αλγορίθμου για ένα επισόδειο
@@ -37,24 +37,22 @@ def main():
             if t == 1:
                 current_moisture = 0.01
             else:
-                current_moisture = agent.get_current_state  # y(t)
+                current_moisture = t  # y(t)
 
             current_state = np.array([current_moisture, y_set])  # s
             current_state_true = current_state.reshape(1, 2)
-            action = agent.evaluate_actor(current_state_true)  # Δίνει το action , α(t)
+            action = agent.evaluate_actor(current_state_true)[0][0]  # Δίνει το action , α(t)
+
 
             T = np.linspace(t, t + 1)
 
-
-
-
-
             next_moisture = output(sys, T, action, current_moisture)  # y(t+1)
 
-            next_state = [next_moisture, y_set]  # s'
-            current_reward = reward(next_moisture)  # r
+            next_state = np.array([next_moisture, y_set])  # s'
 
-            reward_per_episode += reward(next_moisture)  # Συνολικό reward
+            current_reward = reward(next_moisture)  # r   #Αυτό πρέπει να είναι λάθος
+
+            reward_per_time_step += current_reward  # Συνολικό reward
             agent.add_experience(current_state, next_state, action, current_reward)
             agent.model_train()
 

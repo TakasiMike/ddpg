@@ -2,11 +2,10 @@ import tensorflow as tf
 tf.enable_eager_execution()
 
 
-
-
 class ActorCritic(object):   # Κλάση που θα περιέχει τους actor & critic
     w_a = tf.Variable()
     w_c = tf.Variable()
+
     def __init__(self, act_dim, st_dim):
         self.act_dim = act_dim
         self.st_dim = st_dim
@@ -53,34 +52,34 @@ class ActorCritic(object):   # Κλάση που θα περιέχει τους 
             return q   # Q(s,a,Wc)
 
 
-# Μερική παράγωγος του π ως προς Wa
+# # Μερική παράγωγος του π ως προς Wa
+#
+#     def partial_a(self):
+#         with tf.GradientTape() as tape:
+#             pol = self.build_actor(self.s)   # Εδώ θα μπει σαν input το state του αντιστοιχου time step
+#             dp_da = tape.gradient(pol, self.w_a)
+#             return dp_da
+#
+# # Μερική παράγωγος του Q ως προς α
+#
+#     def partial_q_a(self):
+#         with tf.GradientTape() as tape:
+#             q_table = self.build_c(self.s, self.a)
+#             pol = self.build_actor(self.s)  # Εδώ θα μπει σαν input το state του αντιστοιχου time step
+#             dq_da = tape.gradient(q_table, pol)
+#             return dq_da
+#
+# # Μερική παράγωγος του Q ως προς w_c
+#
+#     def partial_q_wc(self):
+#         with tf.GradientTape() as tape:
+#             q_table = self.build_c(self.s, self.a)
+#             dq_dw = tape.gradient(q_table, self.w_c)
+#             return dq_dw
+#
+# # Υπολογισμός reward function
 
-    def partial_a(self):
-        with tf.GradientTape() as tape:
-            pol = self.build_actor(self.s)   # Εδώ θα μπει σαν input το state του αντιστοιχου time step
-            dp_da = tape.gradient(pol, self.w_a)
-            return dp_da
 
-# Μερική παράγωγος του Q ως προς α
-
-    def partial_q_a(self):
-        with tf.GradientTape() as tape:
-            q_table = self.build_c(self.s, self.a)
-            pol = self.build_actor(self.s)  # Εδώ θα μπει σαν input το state του αντιστοιχου time step
-            dq_da = tape.gradient(q_table, pol)
-            return dq_da
-
-# Μερική παράγωγος του Q ως προς w_c
-
-    def partial_q_wc(self):
-        with tf.GradientTape() as tape:
-            q_table = self.build_c(self.s, self.a)
-            dq_dw = tape.gradient(q_table, self.w_c)
-            return dq_dw
-
-# Υπολογισμός reward function
-
-    def reward(self):
 
 
 

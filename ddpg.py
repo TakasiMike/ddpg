@@ -32,6 +32,7 @@ class DDPG:
     # Συνάρτηση που βάζει ένα experience (s,a,r,s') στο RM
     def add_experience(self, current_state, next_state, action, reward):
         self.current_state = current_state
+        # print(next_state)
         self.next_state = next_state
         self.action = action
         self.reward = reward
@@ -74,8 +75,11 @@ class DDPG:
             # Σχηματισμός της επόμενης δράσης π(s',W)
             self.next_action_batch = self.actor_net.evaluate_target_actor(self.next_state_batch)
             # Σχηματισμός του Q_t ^i (s',a',W)
-
-            q_next = self.critic_net.evaluate_target_network(self.next_state, self.next_action_batch)
+            # print(self.next_action_batch.shape)
+            # print(self.next_action_batch)
+            # print(self.next_state_batch.shape)
+            # print(self.next_state_batch)
+            q_next = self.critic_net.evaluate_target_network(self.next_state_batch, self.next_action_batch)
 
 
             # Υπολογισμός του reward και προσθήκη του στο άδειο array παρακάτω
@@ -83,9 +87,9 @@ class DDPG:
             for i in range(0, Batch_Size):
 
                 if i == Batch_Size:
-                    self.y_i_batch.append(self.reward())
+                    self.y_i_batch.append(self.reward)
                 else:
-                    self.y_i_batch.append(self.reward() + Gamma*q_next[i][0])
+                    self.y_i_batch.append(self.reward + Gamma*q_next[i][0])
 
             self.y_i_batch = np.array(self.y_i_batch)
             self.y_i_batch = np.reshape(self.y_i_batch, [len(self.y_i_batch), 1])

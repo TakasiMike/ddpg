@@ -76,7 +76,7 @@ class ActorNet:
 
     def train_actor(self, state_t_batch, q_gradient_input):
         self.sess.run(self.optimizer,
-                      feed_dict={self.actor_state_in: state_t_batch, self.q_value_input: q_gradient_input})
+                      feed_dict={self.actor_state_in: state_t_batch, self.q_value_input: q_gradient_input[0]})
 
     def update_target_actor(self):
         self.sess.run(self.update_target_actor_op)

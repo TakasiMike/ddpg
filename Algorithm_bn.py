@@ -1,4 +1,4 @@
-from ddpg import DDPG
+from ddpg_bn import DDPG
 import numpy as np
 # import matplotlib
 import control
@@ -11,6 +11,7 @@ from RM import ReplayMemory
 steps = 1000
 episodes = 500
 y_set = np.random.uniform(0, 1)
+print(y_set)
 eps = 0.01  # Tolerance του reward function
 c = 100  # reward value
 
@@ -44,46 +45,34 @@ def main():
             # For Loop του αλγορίθμου για ένα επισόδειο
             for t in range(steps):
                 if t == 0:
-                    current_moisture = 0.01
+                    current_moisture = 0
                 else:
                     current_moisture = RM.replay_memory[-1][0][0]  # y(t)
+                    print(current_moisture)
 
-
-
-                current_state = np.array([current_moisture, y_set])  # s
+                current_state = np.array([current_moisture, y_set]) # s
+                # print(current_state)
                 current_state_true = current_state.reshape(1, 2)
                 action = agent.evaluate_actor(current_state_true)[0][0]  # Δίνει το action , α(t)
-                print(action)
+                # print(action)
                 T = np.linspace(t, t + 1)
 
                 next_moisture = output(sys, T, action, current_moisture)  # y(t+1)
+                # print(next_moisture)
 
                 next_state = np.array([next_moisture, y_set])  # s'
 
-                current_reward = reward(agent.model_train()[-1])  # r
-                # print("this thing =", agent.model_train()[-1])
+                current_reward = reward(agent.model_train(RM=RM)[-1])  # r
+                # print("this thing =", agent.model_train(RM=RM)[-1])
+                # print(current_reward)
 
                 reward_per_time_step += current_reward  # Συνολικό reward
                 # print(reward_per_time_step)
 
                 RM.add_experience(current_state, next_state, action, current_reward)
-                agent.model_train()
+
+                agent.model_train(RM=RM)
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

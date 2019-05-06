@@ -1,8 +1,8 @@
 import tensorflow as tf
 
-learning_rate = 0.0001
+learning_rate = 0.01
 batch_size = 64
-tau = 0.001
+tau = 0.01
 
 
 class ActorNet:
@@ -23,17 +23,23 @@ class ActorNet:
 
         # Σχηματισμός του κόστους του actor
         # Αρχικά παίρνουμε ως input το dQ/dα από το critic network
-        self.q_value_input = tf.placeholder("float", [None, num_of_actions])
+        self.q_gradient_input = tf.placeholder("float", [None, num_of_actions], name='q_value_input')
         # Παράμετροι ως προς τους οποίους θα πάρουμε το grad της συνάρτησης κόστους
         self.actor_parameters = [self.W1_a, self.B1_a, self.W2_a, self.B2_a, self.W3_a, self.B3_a]
         # Σχηματισμός του (dπ/dW)*(dQ/dα)
-        self.parameter_gradients = tf.gradients(self.actor_model, self.actor_parameters, -self.q_value_input)
+        self.parameter_gradients = tf.gradients(self.actor_model, self.actor_parameters, -self.q_gradient_input)
+        # self.cost = tf.reduce_sum(tf.cast(self.parameter_gradients, float))
         # Σχηματισμός των gradients με τον optimizer
         self.optimizer = tf.train.AdamOptimizer(learning_rate).apply_gradients(zip(self.parameter_gradients,
                                                                                    self.actor_parameters))
+        # # self.policy_gradient = tf.add([g for g in self.parameter_gradients])
+        # self.optimizer = tf.train.AdamOptimizer(learning_rate).minimize(self.cost)
+
+
 
         # Initialization όλων των μεταβλητών
         self.sess.run(tf.initialize_all_variables())
+
 
         self.sess.run([
             self.t_W1_a.assign(self.W1_a),
@@ -52,8 +58,8 @@ class ActorNet:
             self.t_B3_a.assign(tau*self.B3_a + (1-tau)*self.t_B3_a)]
 
     def create_actor_net(self, num_of_states=2, num_of_actions=1):
-        num_hidden_1 = 30
-        num_hidden_2 = 30
+        num_hidden_1 = 400
+        num_hidden_2 = 400
         actor_state_in = tf.placeholder(tf.float32, shape=[None, num_of_states])
         W1_a = tf.Variable(tf.random.uniform([num_of_states, num_hidden_1]))
         W2_a = tf.Variable(tf.random.uniform([num_hidden_1, num_hidden_2]))
@@ -74,9 +80,10 @@ class ActorNet:
     def evaluate_target_actor(self, state_t_1):
         return self.sess.run(self.t_actor_model, feed_dict={self.t_actor_state_in: state_t_1})
 
-    def train_actor(self, state_t_batch, q_gradient_input):
+    def train_actor(self, current_state_batch, q_gradient_input):
         self.sess.run(self.optimizer,
-                      feed_dict={self.actor_state_in: state_t_batch, self.q_value_input: q_gradient_input[0]})
+                      feed_dict={self.actor_state_in: current_state_batch, self.q_gradient_input: q_gradient_input})
+
 
     def update_target_actor(self):
         self.sess.run(self.update_target_actor_op)

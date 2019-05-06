@@ -1,8 +1,8 @@
 import tensorflow as tf
 import numpy as np
 
-learning_rate = 0.0001
-tau = 0.0001
+learning_rate = 0.01
+tau = 0.001
 
 
 class CriticNet:
@@ -21,18 +21,20 @@ class CriticNet:
 
         # Παράμετροι του target critic network
         self.t_W1_c, self.t_B1_c, self.t_W2_c, self.t_W2_action_c, self.t_B2_c, self.t_W3_c, self.t_B3_c, \
-             self.t_critic_state_in, \
+            self.t_critic_state_in, \
             self.t_critic_action_in, self.t_critic_q_model = self.create_critic_net(num_of_states, num_of_actions)
 
 
 
         # Σχηματισμός της συνάρτησης κόστους του critic, η οποία θα ελαχιστοποιηθεί ως προς τα βάρη Wc
         self.q_value_in = tf.placeholder("float", [None, 1])
-        self.l2_regularizer_loss = 0.0001 * tf.reduce_sum(tf.pow(self.W2_c, 2)) + 0.0001 * tf.reduce_sum(tf.pow(self.B2_c, 2))
+        self.l2_regularizer_loss = 0.1 * tf.reduce_sum(tf.pow(self.W2_c, 2)) + 0.1 * tf.reduce_sum(tf.pow(self.B2_c, 2))
         self.cost = tf.reduce_sum(tf.pow(self.q_value_in - self.critic_q_model, 2)) + self.l2_regularizer_loss
         self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.cost)
 
-
+        self.act_grad_v = tf.gradients(self.critic_q_model, self.critic_action_in, name='gradients',
+                                       unconnected_gradients=tf.UnconnectedGradients.ZERO)
+        self.action_gradients = [self.act_grad_v[0] / tf.to_float(tf.shape(self.act_grad_v[0])[0])]
 
         self.sess.run(tf.global_variables_initializer())
 
@@ -60,15 +62,15 @@ class CriticNet:
         ]
 
         #  Action Gradient (dQ/da)
-        self.act_grad_v = tf.gradients(self.critic_q_model, self.critic_action_in, name='gradients',unconnected_gradients='zero')
+        # self.act_grad_v = tf.gradients(self.critic_q_model, self.critic_action_in, name='gradients', unconnected_gradients='zero')
 
 
 
     # Δημιουργία του νευρωνικού δικτύου του critic. Τελικά παράγεται το Q-table, δηλαδή το critic_q_model
 
     def create_critic_net(self, num_of_states=2, num_of_actions=1):
-        num_hidden_1 = 30
-        num_hidden_2 = 30
+        num_hidden_1 = 300
+        num_hidden_2 = 300
         critic_state_in = tf.placeholder('float', [None, num_of_states], name="state_in")
         critic_action_in = tf.placeholder('float', [None, num_of_actions], name="action_in")
         W1_c = tf.Variable(tf.random.uniform([num_of_states, num_hidden_1]))
@@ -85,10 +87,6 @@ class CriticNet:
         critic_q_model = tf.matmul(H2_c, W3_c) + B3_c
         return W1_c, B1_c, W2_c, W2_action_c,  B2_c, W3_c, B3_c, critic_state_in, critic_action_in, critic_q_model
 
-
-
-
-
     # Συνάρτηση που εκπαιδεύει το critic network
     def train_critic(self, state_t_batch, action_batch, y_i_batch):
         self.sess.run(self.optimizer, feed_dict={self.critic_state_in: state_t_batch,
@@ -103,7 +101,7 @@ class CriticNet:
     # Συνάρτηση που υπολογίζει το dQ/dα. Σαν inputs έχει το s και α
 
     def compute_dq_da(self, state_t, action_t):
-        return self.sess.run(self.act_grad_v,
+        return self.sess.run(self.action_gradients,
                              feed_dict={self.critic_state_in: state_t, self.critic_action_in: action_t})
     #
     # def compute_dq_dw(self, state_t, weights_t):

@@ -2,42 +2,54 @@ import random
 from collections import deque
 import numpy as np
 
+capacity = 100000
+num_of_actions = 1
+
 
 class ReplayMemory(object):
 
-    def __init__(self, capacity=100000):   # Αρχικοποιεί την κλάση
-        self.capacity = capacity   # Πόσο χωράει η μνήμη, ορίζεται από εμένα (εδώ 100000)
-        self.memory = deque()          # Tι έχει μπει στην μνήμη (αρχίζει ως άδεια)
-        self.position = 0            # Η αρχική θέση ενός entry της μνήμης
+    def __init__(self, capacity=100000):
+        self.capacity = capacity
+        self.replay_memory = deque()
+        self.position = 0
+        self.time_step = 0
 
-    def save(self, s, a, s_next, r):             # Σώζει μια επανάληψη
-        experience = (s, a, s_next, r)
-        if len(self.memory) < self.capacity:
-            self.memory.append(experience)      # Βάζει ενα state στην άδεια λίστα της μνήμης
-            self.memory += 1
-        else:                                # Αν ξεπεράσουμε την χωρητικότητα της μνήμης διαγράφουμε παλιά στοιχεία
-            del self.memory[0]
-            self.memory.append(experience)
+        # Συνάρτηση που βάζει ένα experience (s,a,r,s') στο RM
+    def add_experience(self, current_state, next_state, action, reward):
+        self.current_state = current_state
+        self.next_state = next_state
+        self.action = action
+        self.reward = reward
+        self.replay_memory.append((self.current_state, self.next_state, self.action, self.reward))
+        self.time_step += 1
+        if len(self.replay_memory) > capacity:
+            self.replay_memory.popleft()
+        return self.replay_memory
 
-    batch = []
+    def minibatches(self, batch_size):      # Επιλέγει ένα τυχαίο batch από την μνήμη μεγέθους batch_size
 
-    def sample_use(self, batch_size):      # Επιλέγει ένα τυχαίο batch από την μνήμη μεγέθους batch_size
-
-        if self.position < batch_size:
-            batch = random.sample(self.memory, self.position)
+        if len(self.replay_memory) < batch_size:
+            batch = [[[0, 0], [0, 0], 0, 0] for i in range(batch_size)]
         else:
-            batch = random.sample(self.memory, batch_size)
+            batch = random.sample(self.replay_memory, batch_size)
 
-        s_batch = np.array([_[0] for _ in batch])
-        a_batch = np.array([_[1] for _ in batch])
-        r_batch = np.array([_[2] for _ in batch])
-        s_next_batch = np.array([_[3] for _ in batch])
+        # State y(t)
+        self.current_state_batch = [item[0] for item in batch]
+        self.current_state_batch = np.array(self.current_state_batch)
+        # Next State y(t+1)
+        self.next_state_batch = [item[1] for item in batch]
+        self.next_state_batch = np.array(self.next_state_batch)
+        # Reward r(t)
+        self.reward_batch = [item[2] for item in batch]
+        self.reward_batch = np.array(self.reward_batch)
+        # Action π(t)
+        self.action_batch = [item[3] for item in batch]
+        self.action_batch = np.array(self.action_batch)
+        self.action_batch = np.reshape(self.action_batch, [len(self.action_batch), num_of_actions])
+        return batch
 
-        return s_batch, a_batch, r_batch, s_next_batch
 
 
 
 
 
-
-rm = ReplayMemory(capacity=20)

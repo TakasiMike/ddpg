@@ -7,7 +7,7 @@ class grad_inverter:
 
         self.action_size = 1
         self.sess = tf.InteractiveSession()
-        self.action_input = tf.placeholder(tf.float32, [None, 1])
+        self.action_input = tf.placeholder(tf.float32, [None, 1], name="action")
         self.p_max = tf.constant(action_bounds[0], dtype=tf.float32)
         self.p_min = tf.constant(action_bounds[1], dtype=tf.float32)
         self.p_range = self.p_max - self.p_min

@@ -3,14 +3,13 @@ import numpy as np
 import math
 
 
-T = np.linspace(0, 1, 100)
-action = [2, 1]
+T = np.linspace(0, 1)
+action = 30
 
-init_cond = math.log(10)
-
+init_cond = 0
 
 def output(system):
-    return control.forced_response(system, T, U=action, X0=init_cond)[1][99]
+    return control.forced_response(system, T, U=action, X0=init_cond)
 
 
 g = control.tf([0.05, 0], [-0.6, 1])

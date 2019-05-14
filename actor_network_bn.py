@@ -6,8 +6,8 @@ import numpy as np
 LEARNING_RATE = 0.0001
 TAU = 0.001
 BATCH_SIZE = 64
-N_HIDDEN_1 = 400
-N_HIDDEN_2 = 300
+N_HIDDEN_1 = 400  #400
+N_HIDDEN_2 = 300   #300
 
 
 class ActorNet_bn:
@@ -65,11 +65,11 @@ class ActorNet_bn:
 
             # cost of actor network:
             self.q_gradient_input = tf.placeholder("float", [None,
-                                                             num_actions])  # gets input from action_gradient computed in critic network file
+                                                             num_actions])
             self.actor_parameters = [self.W1_a, self.B1_a, self.W2_a, self.B2_a, self.W3_a, self.B3_a,
                                      self.H1_a_bn.scale, self.H1_a_bn.beta, self.H2_a_bn.scale, self.H2_a_bn.beta]
             self.parameters_gradients = tf.gradients(self.actor_model, self.actor_parameters,
-                                                     -self.q_gradient_input)  # /BATCH_SIZE) changed -self.q_gradient to -
+                                                     -self.q_gradient_input)
 
             self.optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE, epsilon=1e-08).apply_gradients(
                 zip(self.parameters_gradients, self.actor_parameters))
@@ -77,7 +77,7 @@ class ActorNet_bn:
             self.sess.run(tf.initialize_all_variables())
 
             # To make sure actor and target have same intial parmameters copy the parameters:
-            # copy target parameters
+
             self.sess.run([
                 self.t_W1_a.assign(self.W1_a),
                 self.t_B1_a.assign(self.B1_a),
@@ -98,11 +98,11 @@ class ActorNet_bn:
             ]
 
     def evaluate_actor(self, state_t):
-        return self.sess.run(self.actor_model, feed_dict={self.actor_state_in: state_t, self.is_training: True})
+        return self.sess.run(self.actor_model, feed_dict={self.actor_state_in: state_t, self.is_training: False})
 
     def evaluate_target_actor(self, state_t_1):
         return self.sess.run(self.t_actor_model,
-                             feed_dict={self.t_actor_state_in: state_t_1, self.t_is_training: True})
+                             feed_dict={self.t_actor_state_in: state_t_1, self.t_is_training: False})
 
     def train_actor(self, actor_state_in, q_gradient_input):
         self.sess.run([self.optimizer, self.H1_a_bn.train_mean, self.H1_a_bn.train_var, self.H2_a_bn.train_mean,

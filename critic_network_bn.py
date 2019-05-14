@@ -1,13 +1,13 @@
 import tensorflow as tf
 import math
 from batch_normalization import batch_norm
-import numpy as np
 
-LEARNING_RATE = 0.001
+
+LEARNING_RATE = 0.0001
 TAU = 0.001
 BATCH_SIZE = 64
-N_HIDDEN_1 = 400
-N_HIDDEN_2 = 300
+N_HIDDEN_1 = 400  #400
+N_HIDDEN_2 = 300   #300
 
 
 class CriticNet_bn:
@@ -79,20 +79,20 @@ class CriticNet_bn:
             # self.l2_regularizer_loss = tf.nn.l2_loss(self.W1_c)+tf.nn.l2_loss(self.W2_c)+ tf.nn.l2_loss(self.W2_action_c) + tf.nn.l2_loss(self.W3_c)+tf.nn.l2_loss(self.B1_c)+tf.nn.l2_loss(self.B2_c)+tf.nn.l2_loss(self.B3_c)
             self.l2_regularizer_loss = 0.0001 * tf.reduce_sum(tf.pow(self.W2_c, 2))
             self.cost = tf.pow(self.critic_q_model - self.q_value_in,
-                               2) / BATCH_SIZE + self.l2_regularizer_loss  # /tf.to_float(tf.shape(self.q_value_in)[0])
+                               2) / BATCH_SIZE + self.l2_regularizer_loss
 
             self.optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(self.cost)
             self.act_grad_v = tf.gradients(self.critic_q_model, self.critic_action_in)
             self.action_gradients = [
-                self.act_grad_v[0] / tf.to_float(tf.shape(self.act_grad_v[0])[0])]  # this is just divided by batch size
-            # from simple actor net:
+                self.act_grad_v[0] / tf.to_float(tf.shape(self.act_grad_v[0])[0])]
+
             self.check_fl = self.action_gradients
 
-            # initialize all tensor variable parameters:
+
             self.sess.run(tf.initialize_all_variables())
 
             # To initialize critic and target with the same values:
-            # copy target parameters
+
             self.sess.run([
                 self.t_W1_c.assign(self.W1_c),
                 self.t_B1_c.assign(self.B1_c),
@@ -126,12 +126,12 @@ class CriticNet_bn:
     def evaluate_target_critic(self, state_t_1, action_t_1):
         return self.sess.run(self.t_critic_q_model,
                              feed_dict={self.t_critic_state_in: state_t_1, self.t_critic_action_in: action_t_1,
-                                        self.is_training: True})
+                                        self.is_training: False})
 
     def compute_delQ_a(self, state_t, action_t):
         return self.sess.run(self.action_gradients,
                              feed_dict={self.critic_state_in: state_t, self.critic_action_in: action_t,
-                                        self.is_training: True})
+                                        self.is_training: False})
 
     def update_target_critic(self):
         self.sess.run(self.update_target_critic_op)

@@ -21,6 +21,6 @@ class grad_inverter:
 
     def inverter(self, grad, action):
 
-        return self.sess.run(self.grad_inverter, feed_dict={self.action_input: action, self.act_grad: grad[0]})
+        return self.sess.run(self.grad_inverter, feed_dict={self.act_grad: grad, self.action_input: action})
 
 

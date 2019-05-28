@@ -1,24 +1,44 @@
-from RM import ReplayMemory
-import numpy as np
-Batch = 20
-RM = ReplayMemory(100)
+import math
 
 
-for i in range(120):
-    cr = [np.random.randint(1, 100), np.random.randint(1, 100)]
-    a = np.random.randint(1, 100)
-    ne = np.random.randint(1, 100)
-    r = np.random.randint(1, 100)
-    exp = np.array(RM.add_experience(cr, a, ne, r))
+def modulus(m, n):
+    mod = []
+    for j in range(1, m):
+        if j == 1:
+            mod.append(n % m)
+            a_1 = mod[0]
+            return a_1
+        elif (j > 1) and (n - m + mod[j - 1] > m):
+            mod.append(n - m + mod[j - 1] % m)
+            return mod
+        elif (j > 2) and (n - m + mod[j - 1]) < m:
+            mod.append(m - ((n - mod[j - 2]) % m))
+            return mod
 
-# print(exp)
-opop = RM.minibatches(40)
-# print(opop)
-# for i in range(Batch):
-#     print(opop[i][0][1])
 
-print(opop)
-print(len(opop))
 
-# batch = [[0, 0] for i in range(10)]
-# print(batch)
+# def a_i(m, n):
+#     a_list = []
+#     for i in range(1, m):
+#         a_list.append(modulus(m, n, i))
+#     return a_list
+
+
+def x_i(m, n):
+    x = 0
+    for j in range(0, m - 1):
+        if (n - m + modulus(m, n)[j]) % m != 0:
+            x += math.floor((n - m + modulus(m, n)[j]))
+            return x
+
+
+def number_of_bounces(m, n):
+    N = 2 * (m - 1) + x_i(m, n) + math.floor(n/m) - 1
+    return N
+
+
+print(modulus(6, 8))
+
+
+
+

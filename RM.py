@@ -2,7 +2,7 @@ import random
 from collections import deque
 import numpy as np
 
-capacity = 100000
+capacity = 10000
 num_of_actions = 1
 
 

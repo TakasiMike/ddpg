@@ -8,9 +8,9 @@ from grad_inverter import grad_inverter
 import random
 
 
-RM_size = 100000
+RM_size = 10000
 Batch_Size = 64
-capacity = 100000
+capacity = 10000
 
 Gamma = 0.99  # Discount Factor
 
@@ -21,7 +21,7 @@ class DDPG:
         self.num_of_actions = num_of_actions
         self.critic_net = CriticNet_bn(self.num_of_states, self.num_of_actions)
         self.actor_net = ActorNet_bn(self.num_of_states, self.num_of_actions)
-        # Initialize Buffer Network:
+
         self.replay_memory = deque()
 
         # Intialize time step:
@@ -29,7 +29,7 @@ class DDPG:
         self.counter = 0
 
         # Ορισμός μέγιστης και ελάχιστης δράσης και κάλεσμα του grad inverter
-        action_max = 35
+        action_max = 550
         action_min = 5
         action_bounds = [action_max, action_min]
         self.grad_inverter = grad_inverter(action_bounds)
@@ -43,7 +43,7 @@ class DDPG:
         self.next_state = next_state
         self.action = action
         self.reward = reward
-        self.replay_memory.append((self.current_state, self.next_state, self.action, self.reward))
+        self.replay_memory.append((self.current_state, self.next_state, self.reward, self.action))
         self.time_step += 1
         if len(self.replay_memory) > capacity:
             self.replay_memory.popleft()
@@ -114,7 +114,8 @@ class DDPG:
         action_for_gradient = self.actor_net.evaluate_actor(self.current_state_batch)
 
         # Υπολογισμός του gradient inverter (Βήμα 17 του αλγορίθμου):
-        self.dq_da = self.critic_net.compute_delQ_a(self.current_state_batch, action_for_gradient)[0]
+        self.dq_da = (self.critic_net.compute_delQ_a(self.current_state_batch, action_for_gradient))
+
         self.dq_da = self.grad_inverter.inverter(self.dq_da, action_for_gradient)
         # print(self.dq_da)
 

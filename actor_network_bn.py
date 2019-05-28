@@ -17,7 +17,7 @@ class ActorNet_bn:
 
             self.sess = tf.InteractiveSession()
 
-            # actor network model parameters
+            # actor network model parameters:
             self.actor_state_in = tf.placeholder("float", [None, num_states])
             self.W1_a = tf.Variable(
                 tf.random_uniform([num_states, N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)))
@@ -33,11 +33,11 @@ class ActorNet_bn:
             self.is_training = tf.placeholder(tf.bool, [])
             self.H1_t = tf.matmul(self.actor_state_in, self.W1_a)
             self.H1_a_bn = batch_norm(self.H1_t, N_HIDDEN_1, self.is_training, self.sess)
-            self.H1_a = tf.nn.softplus(self.H1_a_bn.bnorm) + self.B1_a
+            self.H1_a = tf.nn.relu(self.H1_a_bn.bnorm) + self.B1_a
 
             self.H2_t = tf.matmul(self.H1_a, self.W2_a)
             self.H2_a_bn = batch_norm(self.H2_t, N_HIDDEN_2, self.is_training, self.sess)
-            self.H2_a = tf.nn.tanh(self.H2_a_bn.bnorm) + self.B2_a
+            self.H2_a = tf.nn.relu(self.H2_a_bn.bnorm) + self.B2_a
             self.actor_model = tf.matmul(self.H2_a, self.W3_a) + self.B3_a
 
             # target actor network model parameters:
@@ -56,11 +56,11 @@ class ActorNet_bn:
             self.t_is_training = tf.placeholder(tf.bool, [])
             self.t_H1_t = tf.matmul(self.t_actor_state_in, self.t_W1_a)
             self.t_H1_a_bn = batch_norm(self.t_H1_t, N_HIDDEN_1, self.t_is_training, self.sess, self.H1_a_bn)
-            self.t_H1_a = tf.nn.softplus(self.t_H1_a_bn.bnorm) + self.t_B1_a
+            self.t_H1_a = tf.nn.relu(self.t_H1_a_bn.bnorm) + self.t_B1_a
 
             self.t_H2_t = tf.matmul(self.t_H1_a, self.t_W2_a)
             self.t_H2_a_bn = batch_norm(self.t_H2_t, N_HIDDEN_2, self.t_is_training, self.sess, self.H2_a_bn)
-            self.t_H2_a = tf.nn.tanh(self.t_H2_a_bn.bnorm) + self.t_B2_a
+            self.t_H2_a = tf.nn.relu(self.t_H2_a_bn.bnorm) + self.t_B2_a
             self.t_actor_model = tf.matmul(self.t_H2_a, self.t_W3_a) + self.t_B3_a
 
             # cost of actor network:
@@ -69,14 +69,14 @@ class ActorNet_bn:
             self.actor_parameters = [self.W1_a, self.B1_a, self.W2_a, self.B2_a, self.W3_a, self.B3_a,
                                      self.H1_a_bn.scale, self.H1_a_bn.beta, self.H2_a_bn.scale, self.H2_a_bn.beta]
             self.parameters_gradients = tf.gradients(self.actor_model, self.actor_parameters,
-                                                     -self.q_gradient_input)
+                                                     -self.q_gradient_input/BATCH_SIZE)
 
-            self.optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE, epsilon=1e-08).apply_gradients(
+            self.optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).apply_gradients(
                 zip(self.parameters_gradients, self.actor_parameters))
             # initialize all tensor variable parameters:
             self.sess.run(tf.initialize_all_variables())
 
-            # To make sure actor and target have same intial parmameters copy the parameters:
+
 
             self.sess.run([
                 self.t_W1_a.assign(self.W1_a),

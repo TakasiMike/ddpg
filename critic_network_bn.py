@@ -47,6 +47,8 @@ class CriticNet_bn:
 
             self.critic_q_model = tf.matmul(self.H2_c, self.W3_c) + self.B3_c
 
+
+
             # Target Critic Q Network:
             self.t_critic_state_in = tf.placeholder("float", [None, num_states])
             self.t_critic_action_in = tf.placeholder("float", [None, num_actions])
@@ -86,7 +88,7 @@ class CriticNet_bn:
             #                            0.01 * tf.reduce_sum(tf.pow(self.B2_c, 2)) + \
             #                            0.01 * tf.reduce_sum(tf.pow(self.B3_c, 2)) + \
             #                            0.01 * tf.reduce_sum(tf.pow(self.W2_action_c, 2))
-            self.cost = (tf.reduce_mean(pow(self.critic_q_model - self.q_value_in, 2)) ) / BATCH_SIZE
+            self.cost = (tf.reduce_mean(pow(self.critic_q_model - self.q_value_in, 2))) / BATCH_SIZE
 
             self.optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(self.cost)
             self.act_grad_v = tf.gradients(self.critic_q_model, self.critic_action_in)

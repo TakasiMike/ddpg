@@ -1,43 +1,39 @@
+import tensorflow as tf
 import math
 
+# Παράμετροι
+V = 100
+UA = 20000
+density = 1000
+Cp = 4.2
+minus_DH = 596619
+k0 = 6.85 * (10 ** 11)
+E = 76534.704
+R = 8.314
+T_in = 275
+Ca_in = 1
+# T_j = 250
+# F = 20
 
-def modulus(m, n):
-    mod = []
-    for j in range(1, m):
-        if j == 1:
-            mod.append(n % m)
-            a_1 = mod[0]
-            return a_1
-        elif (j > 1) and (n - m + mod[j - 1] > m):
-            mod.append(n - m + mod[j - 1] % m)
-            return mod
-        elif (j > 2) and (n - m + mod[j - 1]) < m:
-            mod.append(m - ((n - mod[j - 2]) % m))
-            return mod
+class solv_diff:
 
+    def __init__(self):
 
+        self.sess = tf.InteractiveSession()
+        self.F = tf.placeholder("float", [1, 1])
+        self.T_j = tf.placeholder("float", [1, 1])
 
-# def a_i(m, n):
-#     a_list = []
-#     for i in range(1, m):
-#         a_list.append(modulus(m, n, i))
-#     return a_list
+    def equations(self, state, t):
 
+        Ca, T = state
+        self.d_Ca = (self.F / V) * (Ca_in - Ca) - 2 * k0 * math.exp(E / (R * T)) * (Ca ** 2)
+        self.d_T = (self.F / V) * (T_in - T) + 2 * (minus_DH / (density * Cp)) * k0 * math.exp(E / (R * T)) * (Ca ** 2) - \
+                (UA / (V * density * Cp)) * (T - self.T_j)
+        self.differential = [self.d_Ca, self.d_T]
+        return self.differential
 
-def x_i(m, n):
-    x = 0
-    for j in range(0, m - 1):
-        if (n - m + modulus(m, n)[j]) % m != 0:
-            x += math.floor((n - m + modulus(m, n)[j]))
-            return x
-
-
-def number_of_bounces(m, n):
-    N = 2 * (m - 1) + x_i(m, n) + math.floor(n/m) - 1
-    return N
-
-
-print(modulus(6, 8))
+    def evaluate_next_state(self, flow, temperature):
+        return self.sess.run(self.differential, feed_dict={self.F: flow, self.T_j: temperature})
 
 
 

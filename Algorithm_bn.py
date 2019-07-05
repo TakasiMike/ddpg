@@ -97,7 +97,7 @@ def main():
                 # print(current_reward)
                 agent.add_experience(current_state, next_state, current_reward, action_true)
 
-                if this > 20000:
+                if this > 100:
                     agent.model_train()
                 reward_per_episode += current_reward  # Συνολικό reward
                 this += 1

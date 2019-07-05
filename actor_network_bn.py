@@ -3,11 +3,11 @@ import math
 from batch_normalization import batch_norm
 import numpy as np
 
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.0005
 TAU = 0.001
-BATCH_SIZE = 64
-N_HIDDEN_1 = 400  #400
-N_HIDDEN_2 = 300   #300
+BATCH_SIZE = 128
+N_HIDDEN_1 = 450  #400
+N_HIDDEN_2 = 400   #300
 
 
 class ActorNet_bn:
@@ -20,15 +20,15 @@ class ActorNet_bn:
             # actor network model parameters:
             self.actor_state_in = tf.placeholder("float", [None, num_states])
             self.W1_a = tf.Variable(
-                tf.random_uniform([num_states, N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)))
+                tf.random_uniform([num_states, N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)), name="W1_a")
             self.B1_a = tf.Variable(
-                tf.random_uniform([N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)))
+                tf.random_uniform([N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)), name="B1_a")
             self.W2_a = tf.Variable(
-                tf.random_uniform([N_HIDDEN_1, N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)))
+                tf.random_uniform([N_HIDDEN_1, N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)), name="W2_a")
             self.B2_a = tf.Variable(
-                tf.random_uniform([N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)))
-            self.W3_a = tf.Variable(tf.random_uniform([N_HIDDEN_2, num_actions], -0.003, 0.003))
-            self.B3_a = tf.Variable(tf.random_uniform([num_actions], -0.003, 0.003))
+                tf.random_uniform([N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)), name="B2_a")
+            self.W3_a = tf.Variable(tf.random_uniform([N_HIDDEN_2, num_actions], -0.003, 0.003), name="W3_a")
+            self.B3_a = tf.Variable(tf.random_uniform([num_actions], -0.003, 0.003), name="B3_a")
 
             self.is_training = tf.placeholder(tf.bool, [])
             self.H1_t = tf.matmul(self.actor_state_in, self.W1_a)
@@ -40,18 +40,19 @@ class ActorNet_bn:
             self.H2_a = tf.nn.relu(self.H2_a_bn.bnorm) + self.B2_a
             self.actor_model = tf.matmul(self.H2_a, self.W3_a) + self.B3_a
 
+
             # target actor network model parameters:
             self.t_actor_state_in = tf.placeholder("float", [None, num_states])
             self.t_W1_a = tf.Variable(
-                tf.random_uniform([num_states, N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)))
+                tf.random_uniform([num_states, N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)), name="t_W1_a")
             self.t_B1_a = tf.Variable(
-                tf.random_uniform([N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)))
+                tf.random_uniform([N_HIDDEN_1], -1 / math.sqrt(num_states), 1 / math.sqrt(num_states)), name="t_B1_a")
             self.t_W2_a = tf.Variable(
-                tf.random_uniform([N_HIDDEN_1, N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)))
+                tf.random_uniform([N_HIDDEN_1, N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)), name="t_W2_a")
             self.t_B2_a = tf.Variable(
-                tf.random_uniform([N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)))
-            self.t_W3_a = tf.Variable(tf.random_uniform([N_HIDDEN_2, num_actions], -0.003, 0.003))
-            self.t_B3_a = tf.Variable(tf.random_uniform([num_actions], -0.003, 0.003))
+                tf.random_uniform([N_HIDDEN_2], -1 / math.sqrt(N_HIDDEN_1), 1 / math.sqrt(N_HIDDEN_1)), name="t_B2_a")
+            self.t_W3_a = tf.Variable(tf.random_uniform([N_HIDDEN_2, num_actions], -0.003, 0.003), name="t_W3_a")
+            self.t_B3_a = tf.Variable(tf.random_uniform([num_actions], -0.003, 0.003), name="t_B3_a")
 
             self.t_is_training = tf.placeholder(tf.bool, [])
             self.t_H1_t = tf.matmul(self.t_actor_state_in, self.t_W1_a)
@@ -71,10 +72,12 @@ class ActorNet_bn:
             self.parameters_gradients = tf.gradients(self.actor_model, self.actor_parameters,
                                                      -self.q_gradient_input/BATCH_SIZE)
 
-            self.optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).apply_gradients(
+            self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=LEARNING_RATE).apply_gradients(
                 zip(self.parameters_gradients, self.actor_parameters))
             # initialize all tensor variable parameters:
             self.sess.run(tf.initialize_all_variables())
+            self.saver = tf.train.Saver()
+            self.saver.save(self.sess, 'DDPG_MIMO', global_step=1000)
 
 
 

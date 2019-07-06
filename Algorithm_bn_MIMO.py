@@ -73,9 +73,9 @@ def reward(state1, state1_next, state2, state2_next):
     elif abs(state1_next - C_set) < eps_1 and abs(state2_next - T_set) < eps_2:
         return 100
     elif state1_next < C_set - 0.005 or state2_next > T_set + 1:
-        return -100
+        return -20
     else:
-        return -1
+        return -10
 
 
 
@@ -162,7 +162,11 @@ def main():
                 #         break
                 if t > 20 and abs((agent.replay_memory[-1][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-2][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-3][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-4][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-5][1][0]) - C_set) < eps_1\
                         and abs((agent.replay_memory[-1][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-2][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-3][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-4][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-5][1][2]) - T_set) < eps_2:
-                        break
+                        # with tf.Session() as sess:
+                        #     saver = tf.train.Saver()
+                        #     saver = saver.save(sess, 'ddpg_trained')
+                        # break
+
             total_reward += reward_per_episode
             # print(total_reward)
 

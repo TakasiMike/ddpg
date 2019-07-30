@@ -89,7 +89,8 @@ class CriticNet_bn:
             #                            0.01 * tf.reduce_sum(tf.pow(self.B2_c, 2)) + \
             #                            0.01 * tf.reduce_sum(tf.pow(self.B3_c, 2)) + \
             #                            0.01 * tf.reduce_sum(tf.pow(self.W2_action_c, 2))
-            self.cost = (tf.reduce_mean(pow(self.critic_q_model - self.q_value_in, 2))) # + self.l2_regularizer_loss
+            self.cost = (tf.reduce_mean(pow(self.critic_q_model - self.q_value_in, 2))) \
+                        # + self.l2_regularizer_loss
 
             self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=LEARNING_RATE).minimize(self.cost)
             self.act_grad_v = tf.gradients(self.critic_q_model, self.critic_action_in)
@@ -99,8 +100,8 @@ class CriticNet_bn:
             self.check_fl = self.action_gradients
 
             self.sess.run(tf.initialize_all_variables())
-            self.saver = tf.train.Saver()
-            self.saver.save(self.sess, 'DDPG_MIMO', global_step=1000)
+            # self.saver = tf.train.Saver()
+            # self.saver.save(self.sess, 'DDPG_MIMO', global_step=1000)
 
             # To initialize critic and target with the same values:
 

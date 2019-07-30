@@ -45,8 +45,8 @@ class DDPG:
     def add_experience(self, current_state, next_state, reward, action):
         self.current_state = current_state
         self.next_state = next_state
-        self.action = action
         self.reward = reward
+        self.action = action
         self.replay_memory.append((self.current_state, self.next_state, self.reward, self.action))
         self.time_step += 1
         if len(self.replay_memory) > capacity:

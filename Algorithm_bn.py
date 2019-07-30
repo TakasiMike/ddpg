@@ -13,7 +13,7 @@ import math
 steps = 300
 episodes = 5000
 # y_set = np.random.uniform(0, 1)
-y_set = 1.5
+y_set = 0.5
 print(y_set)
 eps = 0.01  # Tolerance του reward function
 c = 100  # reward value
@@ -33,17 +33,19 @@ number_of_actions = 1
 #     else:
 #         return -10
 
-def reward(state, state_next):
-    if abs(state_next - y_set) < abs(state - y_set) and state_next < y_set + error and abs(state - y_set) < eps:
-        return 100 / (math.sqrt(abs(state_next - y_set)) + 1)
-    else:
-        return -5
-
 # def reward(state, state_next):
-#     if abs(state_next - y_set) < abs(state - y_set):
-#         return 0
+#     if abs(state_next - y_set) < abs(state - y_set) and state_next < y_set + error and abs(state - y_set) < eps:
+#         return 100 / (math.sqrt(abs(state_next - y_set)) + 1)
 #     else:
-#         return -1
+#         return -5
+
+def reward(state, state_next):
+    if abs(state_next - y_set) < abs(state - y_set):
+        return 0.001 / (abs(state_next - y_set))
+    elif abs(state_next - y_set) < 0.01:
+        return 100
+    else:
+        return -10
 
 def output(system, T, U, init_cond):
     return control.forced_response(system, T, U, init_cond)[1][49]
@@ -79,7 +81,7 @@ def main():
                 action = agent.evaluate_actor(current_state_true)  # Δίνει το action , α(t)
                 noise = exploration_noise.noise()  # OU-Noise Ν
                 action_true = action[0][0] + noise[0]
-                # print(action[0][0])
+                print(action_true)
                 T = np.linspace(0, 1)
                 # T = np.linspace(t, t + 1)
 
@@ -97,7 +99,7 @@ def main():
                 # print(current_reward)
                 agent.add_experience(current_state, next_state, current_reward, action_true)
 
-                if this > 100:
+                if this > 10000:
                     agent.model_train()
                 reward_per_episode += current_reward  # Συνολικό reward
                 this += 1

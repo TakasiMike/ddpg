@@ -76,8 +76,8 @@ class ActorNet_bn:
                 zip(self.parameters_gradients, self.actor_parameters))
             # initialize all tensor variable parameters:
             self.sess.run(tf.initialize_all_variables())
-            self.saver = tf.train.Saver()
-            self.saver.save(self.sess, 'DDPG_MIMO', global_step=1000)
+            # self.saver = tf.train.Saver()
+            # self.saver.save(self.sess, 'DDPG_MIMO', global_step=1000)
 
 
 

@@ -2,10 +2,12 @@ from ddpg_bn_MIMO import DDPG
 import numpy as np
 from ou_noise import OUNoise
 import tensorflow as tf
-# from RM import ReplayMemory
+
 from scipy.integrate import odeint
-# from scipy.integrate import OdeSolver
-import math
+
+# sess = tf.Session()
+# saver = tf.train.import_meta_graph('DDPG_MIMO-1000.meta')
+# saver.restore(sess, tf.train.latest_checkpoint('./'))
 
 
 # Παράμετροι
@@ -33,7 +35,7 @@ Ca_in = 1
 
 
 steps = 300
-episodes = 5000
+episodes = 3000
 C_set = 0.07
 T_set = 376
 print(C_set)
@@ -67,16 +69,30 @@ number_of_actions = 2
 #     else:
 #         return -1
 
-def reward(state1, state1_next, state2, state2_next):
+# def reward(state1, state1_next, state2, state2_next, temp_of_cool):
+#     if abs(state1_next - C_set) < abs(state1 - C_set) and abs(state2_next - T_set) < abs(state2 - T_set):
+#         return 1
+#     elif abs(state1_next - C_set) < eps_1 and abs(state2_next - T_set) < eps_2:
+#         return 100
+#     elif state1_next < C_set - 0.005 or state2_next > T_set + 1:
+#         return -20
+#     else:
+#         return -10
+
+
+def reward(state1, state1_next, state2, state2_next, act_T_t):
     if abs(state1_next - C_set) < abs(state1 - C_set) and abs(state2_next - T_set) < abs(state2 - T_set):
         return 1
     elif abs(state1_next - C_set) < eps_1 and abs(state2_next - T_set) < eps_2:
-        return 100
+        return 200
     elif state1_next < C_set - 0.005 or state2_next > T_set + 1:
         return -20
+    elif act_T_t > 300:
+        return -100
+    # elif abs(act_T_t - act_T_t_1) > 2:
+    #     return -15
     else:
         return -10
-
 
 
 def main():
@@ -115,11 +131,14 @@ def main():
                 # else:
                 action = (agent.evaluate_actor(current_state_true))[0]  # Δίνει το action , α(t)
                 action_true_F = action[0] + noise[0]
+                print('Flow ' + str(action_true_F))
                 # action_true_F = action[0]
                 # print('action_F ' + str(action_true_F))
                 action_true_T = action[1] + noise[1]
+                action_true = np.array([action_true_F, action_true_T])
+
                 # action_true_T = action[1]
-                # print('action_T ' + str(action_true_T))
+                print('Temp cool ' + str(action_true_T))
 
                 Time = np.linspace(0, 1)
                 init_cond = [current_Ca, current_T]
@@ -131,24 +150,17 @@ def main():
                     d_T = (action_true_F / V) * (T_in - T) + 2 * (minus_DH / (density * Cp)) * k0 * np.exp(- E / (R * T)) * (Ca ** 2) - (UA / (V * density * Cp)) * (T - action_true_T)
                     return [d_Ca, d_T]
 
-                # def equations(state, t):
-                #
-                #
-                #     Ca, T = state
-                #     d_Ca = (action_true_F / V) * (Ca_in - Ca) - 2 * k0 * (1 - (E / (R * T)) + 0.5 * (E / (R * T)) ** 2) * (Ca ** 2)
-                #     d_T = (action_true_F / V) * (T_in - T) + 2 * (minus_DH / (density * Cp)) * k0 * (1 - (E / (R * T)) + 0.5 * (E / (R * T)) ** 2) * (Ca ** 2) - (UA / (V * density * Cp)) * (T - action_true_T)
-                #     return [d_Ca, d_T]
-
                 solution = odeint(equations, init_cond, Time, mxstep=1000000)
                 next_Ca = solution[49][0]  # Ca(t+1)
                 next_T = solution[49][1]  # T(t+1)
 
                 next_state = np.array([next_Ca, C_set, next_T, T_set], dtype=np.float64)  # s'
-                current_reward = reward(current_Ca, next_Ca, current_T, next_T)
+                # current_reward = reward(current_Ca, next_Ca, current_T, next_T, action_true_T, agent.replay_memory[-1][-1][1])
+                current_reward = reward(current_Ca, next_Ca, current_T, next_T, action_true_T)
                 # current_reward = reward(next_Ca, next_T)
 
                 # print(current_reward)
-                agent.add_experience(current_state, next_state, current_reward, action)
+                agent.add_experience(current_state, next_state, current_reward, action_true)
 
                 if this > 10000:
                     agent.model_train()
@@ -163,12 +175,14 @@ def main():
                 if t > 20 and abs((agent.replay_memory[-1][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-2][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-3][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-4][1][0]) - C_set) < eps_1 and abs((agent.replay_memory[-5][1][0]) - C_set) < eps_1\
                         and abs((agent.replay_memory[-1][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-2][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-3][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-4][1][2]) - T_set) < eps_2 and abs((agent.replay_memory[-5][1][2]) - T_set) < eps_2:
                         # with tf.Session() as sess:
+                        #     sess = tf.InteractiveSession()
                         #     saver = tf.train.Saver()
-                        #     saver = saver.save(sess, 'ddpg_trained')
-                        # break
+                        #     saver.save(sess, 'ddpg_trained')
+                        break
 
             total_reward += reward_per_episode
             # print(total_reward)
+
 
 
 if __name__ == "__main__":

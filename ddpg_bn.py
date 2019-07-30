@@ -29,7 +29,7 @@ class DDPG:
         self.counter = 0
 
         # Ορισμός μέγιστης και ελάχιστης δράσης και κάλεσμα του grad inverter
-        action_max = 550
+        action_max = 200
         action_min = 5
         action_bounds = [action_max, action_min]
         self.grad_inverter = grad_inverter(action_bounds)
@@ -102,7 +102,7 @@ class DDPG:
                 self.y_i_batch.append(self.reward_batch[i] + Gamma*q_next[i][0])
 
         self.y_i_batch = np.array(self.y_i_batch)
-        print(self.y_i_batch)
+        # print(self.y_i_batch)
         self.y_i_batch = np.reshape(self.y_i_batch, [len(self.y_i_batch), 1])
         # print(" y_i_batch =",  self.y_i_batch)
 

@@ -1,26 +1,47 @@
 \BOOKMARK [1][-]{section.1}{}{}% 1
-\BOOKMARK [2][-]{subsection.1.1}{ }{section.1}% 2
-\BOOKMARK [1][-]{section.2}{\265 }{}% 3
-\BOOKMARK [1][-]{section.3}{ \040}{}% 4
-\BOOKMARK [2][-]{subsection.3.1}{ \265 \040 }{section.3}% 5
-\BOOKMARK [2][-]{subsection.3.2}{ \040 }{section.3}% 6
-\BOOKMARK [1][-]{section.4}{ }{}% 7
-\BOOKMARK [1][-]{section.5}{ }{}% 8
-\BOOKMARK [2][-]{subsection.5.1}{ \040}{section.5}% 9
-\BOOKMARK [2][-]{subsection.5.2}{ }{section.5}% 10
-\BOOKMARK [1][-]{section.6}{\337 \265 \(Gradient Descent\)}{}% 11
-\BOOKMARK [2][-]{subsection.6.1}{ \337\265 \040 \265}{section.6}% 12
-\BOOKMARK [2][-]{subsection.6.2}{ \040\265 Gradient Descent}{section.6}% 13
-\BOOKMARK [2][-]{subsection.6.3}{ \265 Gradient Descent \040Mini-Batch Gradient Descent}{section.6}% 14
-\BOOKMARK [1][-]{section.7}{-- \040\(Back Propagation\)}{}% 15
-\BOOKMARK [1][-]{section.8}{ }{}% 16
-\BOOKMARK [2][-]{subsection.8.1}{ \040 Markov}{section.8}% 17
-\BOOKMARK [2][-]{subsection.8.2}{ \040Bellman \040Q-\265}{section.8}% 18
-\BOOKMARK [2][-]{subsection.8.3}{Offline \040Online \265}{section.8}% 19
-\BOOKMARK [1][-]{section.9}{\265 Deep Deterministic Policy Gradient}{}% 20
-\BOOKMARK [2][-]{subsection.9.1}{\265 \040\(Replay Memory\)}{section.9}% 21
-\BOOKMARK [2][-]{subsection.9.2}{\337 Ornstein - Uhlenbeck}{section.9}% 22
-\BOOKMARK [2][-]{subsection.9.3}{ }{section.9}% 23
-\BOOKMARK [2][-]{subsection.9.4}{ Adam \(Adam Optimizer\)}{section.9}% 24
-\BOOKMARK [1][-]{section.10}{\265 \040 \265 \040\265 \265 \040 \040 \040}{}% 25
-\BOOKMARK [2][-]{subsection.10.1}{\265 \040\265 \040Banach}{section.10}% 26
+\BOOKMARK [1][-]{section.2}{ }{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{ \337\265 \265 \265}{section.2}% 4
+\BOOKMARK [1][-]{section.3}{\265 }{}% 5
+\BOOKMARK [2][-]{subsection.3.1}{}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.2}{\337 \265 \265}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.3}{ }{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.4}{\265\265 \040- \040 }{section.3}% 9
+\BOOKMARK [1][-]{section.4}{ \040 \040\(Deep Learning\)}{}% 10
+\BOOKMARK [2][-]{subsection.4.1}{}{section.4}% 11
+\BOOKMARK [2][-]{subsection.4.2}{ \265\265 \265 \040 }{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.3}{ \040 }{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.4}{ \(Feed Forward\)}{section.4}% 14
+\BOOKMARK [2][-]{subsection.4.5}{ }{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.6}{ }{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.7}{ }{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.8}{\337 \265 \(Gradient Descent\)}{section.4}% 18
+\BOOKMARK [2][-]{subsection.4.9}{ \040\265 Gradient Descent}{section.4}% 19
+\BOOKMARK [2][-]{subsection.4.10}{ \265 Gradient Descent \040Mini-Batch Gradient Descent}{section.4}% 20
+\BOOKMARK [2][-]{subsection.4.11}{-- \040\(Back Propagation\)}{section.4}% 21
+\BOOKMARK [2][-]{subsection.4.12}{ \265 \040 \(Universal Approximation Theorem\)}{section.4}% 22
+\BOOKMARK [1][-]{section.5}{ }{}% 23
+\BOOKMARK [2][-]{subsection.5.1}{ \040 Markov}{section.5}% 24
+\BOOKMARK [2][-]{subsection.5.2}{ \040Bellman}{section.5}% 25
+\BOOKMARK [2][-]{subsection.5.3}{On-Policy \040Off-Policy \040}{section.5}% 26
+\BOOKMARK [1][-]{section.6}{ \040 \(Deep Reinforcement Learning\)}{}% 27
+\BOOKMARK [2][-]{subsection.6.1}{ \040 \265}{section.6}% 28
+\BOOKMARK [2][-]{subsection.6.2}{\265 \265 \265 \040\(Deterministic Policy Gradient Algorithms\)}{section.6}% 29
+\BOOKMARK [2][-]{subsection.6.3}{\265 \265 - \(Deterministic Actor-Critic Algorithms\)}{section.6}% 30
+\BOOKMARK [2][-]{subsection.6.4}{ \040 \040 \040 }{section.6}% 31
+\BOOKMARK [1][-]{section.7}{\265 Deep Deterministic Policy Gradient}{}% 32
+\BOOKMARK [2][-]{subsection.7.1}{ \040 \040\265}{section.7}% 33
+\BOOKMARK [2][-]{subsection.7.2}{\265 \040\(Replay Memory\)}{section.7}% 34
+\BOOKMARK [2][-]{subsection.7.3}{\337 Ornstein - Uhlenbeck}{section.7}% 35
+\BOOKMARK [2][-]{subsection.7.4}{ \040\(Batch Normalization\)}{section.7}% 36
+\BOOKMARK [2][-]{subsection.7.5}{ \265 \(Gradient Inverter\)}{section.7}% 37
+\BOOKMARK [1][-]{section.8}{\265 \040\265}{}% 38
+\BOOKMARK [2][-]{subsection.8.1}{\265 \040\265 DDPG \040\265\265 \265 \265 \040 \265 }{section.8}% 39
+\BOOKMARK [2][-]{subsection.8.2}{\265 \040\265 DDPG \040\265-\265\265 \265 \040 \040 }{section.8}% 40
+\BOOKMARK [1][-]{section.9}{\265\265 \040\265}{}% 41
+\BOOKMARK [1][-]{section.10}{\265}{}% 42
+\BOOKMARK [2][-]{subsection.10.1}{\265 \040\265 \040Banach}{section.10}% 43
+\BOOKMARK [2][-]{subsection.10.2}{ \040\265 \040\337 Bellman}{section.10}% 44
+\BOOKMARK [2][-]{subsection.10.3}{ \040\265 \265\337 \040}{section.10}% 45
+\BOOKMARK [2][-]{subsection.10.4}{ \040 \040\265 Back-Propagation}{section.10}% 46
+\BOOKMARK [1][-]{section*.24}{\337}{}% 47
